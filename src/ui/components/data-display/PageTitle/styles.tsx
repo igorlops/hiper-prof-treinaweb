@@ -7,7 +7,7 @@ export const PageTitleContainer = styled("div")`
 `
 
 export const PageTitleStyled = styled((props) => (
-    <Typography variant="h1" component={'h1'} {...props}/>
+    <Typography variant="h5" component={'h2'} {...props}/>
 ))<TypographyProps>`
     text-transform: uppercase;
     font-weight: bold;
@@ -18,7 +18,7 @@ export const PageTitleStyled = styled((props) => (
 `;
 
 export const PageSubtitleStyled = styled((props) => (
-    <Typography variant="body1" component={"h3"} {...props} />
+    <Typography variant="body1" component={"h4"} {...props} />
 ))<TypographyProps>`
     color: ${({theme}) => theme.palette.text.primary};
     text-transform: lowercase;
