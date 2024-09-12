@@ -31,5 +31,3 @@ Abaixo está o link para acessar o [Mockup](https://pt.wikipedia.org/wiki/Mockup
 Abaixo você encontrará todas as informações do quê e como deve ser desenvolvido no front-end.
 
 - [API](https://alunos.treinaweb.com.br/hyperprof/doc.html#tag/Me)
-
-
