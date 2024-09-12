@@ -1,5 +1,4 @@
 import { styled, Typography, TypographyProps } from "@mui/material";
-import {Container} from "@mui/material";
 
 export const PageTitleContainer = styled("div")`
     margin: ${({theme}) => theme.spacing(5,0)};
