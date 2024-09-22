@@ -12,7 +12,7 @@ interface DialogProps {
     title?: string;
     isOpen?: boolean;
     onClose: () => void;
-    onCancel: () => void;
+    onCancel?: () => void;
     onConfirm: () => void;
 
 }
