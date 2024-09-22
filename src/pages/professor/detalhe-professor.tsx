@@ -9,19 +9,21 @@ import { grey } from "@mui/material/colors";
 import { BoxCardProfessor, BoxDescription, BoxImage } from "@styles/pages/professor/detalhe-professor.styles";
 import InputMask from 'react-input-mask'
 export default function DetalheProfessor() {
-    const 
-    {       professor,
-            professores,
-            selecionarProfessor,
-            openDialog,
-            setOpenDialog,
-            setAluno,
-            handleSubmit,
-            snackMessage,
-            setSnackMessage,
-            alunoErro,
-            setAlunoErro
+    const {       
+        professor,
+        professores,
+        selecionarProfessor,
+        openDialog,
+        setOpenDialog,
+        setAluno,
+        handleSubmit,
+        snackMessage,
+        setSnackMessage,
+        alunoErro,
+        setAlunoErro
     } = useDetalheProfessor();
+
+    console.log(professor)
     return (
         <Container>
             <PageTitle 
