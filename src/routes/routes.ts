@@ -28,5 +28,19 @@ export const Router = {
             router.push( {pathname: this.name})
         },
         icon: ""
+    },
+    listaDeAlunos: {
+        name: "/professor/",
+        push: function(router: NextRouter) {
+            router.push( {pathname: this.name})
+        },
+        icon: ""
+    },
+    login: {
+        name: "/login",
+        push: function(router: NextRouter) {
+            router.push( {pathname: this.name})
+        },
+        icon: ""
     }
 };
