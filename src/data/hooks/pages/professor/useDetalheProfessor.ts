@@ -36,7 +36,6 @@ export default function useDetalheProfessor() {
 
         return () => {
             console.log("removendo item")
-            sessionStorage.removeItem("hyperprof_professor")
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
@@ -52,6 +51,7 @@ export default function useDetalheProfessor() {
 
     function selecionarProfessor(professor:ProfessorInterface) {
         setProfessor(professor);
+        sessionStorage.removeItem("hyperprof_professor")
         sessionStorage.setItem("hyperprof_professor", JSON.stringify(professor));
         BrowserService.scrollToTop()
     }
