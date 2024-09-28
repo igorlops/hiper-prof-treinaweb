@@ -5,6 +5,5 @@ export interface AlunoInterface {
     data_aula: string|Date;
 }
 
-export interface AlunoErrorResponseInterface extends AlunoInterface {
-
-}
+export interface AlunoErrorResponseInterface 
+    extends Omit<AlunoInterface, 'id'> {}
