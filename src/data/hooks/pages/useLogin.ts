@@ -1,10 +1,12 @@
 import { ResponseErrorInterface } from "@data/@types/axios_response";
 import { LoginErrorInterface, LoginInterface, ResponseLoginInterface } from "@data/@types/login";
+import { ProfessorContext } from "@data/contexts/ProfessorContext";
 import { ApiService } from "@data/services/ApiService";
+import { getUser } from "@data/services/MeService";
 import { Router } from "@routes/routes";
 import { AxiosError, AxiosResponse } from "axios";
 import { useRouter } from "next/router";
-import { FormEvent, useState } from "react";
+import { FormEvent, useContext, useState } from "react";
 
 export default function useLogin(){
     const [valuesLogin, setValuesLogin] = useState<LoginInterface>(
@@ -13,16 +15,18 @@ export default function useLogin(){
     [messageError, setMessageError] = useState<LoginErrorInterface>(),
     [loading, setLoading] = useState(false),
     [snackMessage, setSnackMessage] = useState(''),
-    router = useRouter()
+    router = useRouter(),
+    {ProfessorState: professor, ProfessorDispatch} = useContext(ProfessorContext)
     async function handleLogin(event:FormEvent) {
         event.preventDefault();
 
         if(!loading) {
             setLoading(true)
             await ApiService.post('/api/auth/login', valuesLogin)
-                .then(({data}: AxiosResponse<ResponseLoginInterface>) => {
+                .then( async ({data}: AxiosResponse<ResponseLoginInterface>) => {
                     localStorage.setItem('token_hiperprof', data.token);
                     localStorage.setItem('refresh_token_hiperprof', data.refresh_token);
+                    await handleGetUser()
                     Router.listaDeAlunos.push(router)
                 })
                 .catch(({ response }: AxiosError<ResponseErrorInterface<LoginErrorInterface>>) => {
@@ -36,6 +40,15 @@ export default function useLogin(){
                     setLoading(false)
                 });
         }
+    }
+
+    async function handleGetUser() {
+        await getUser().then(({ data }) => {
+            ProfessorDispatch(data);
+        })
+        .catch(() => {
+            setSnackMessage("Erro inesperado ao tentar fazer login")
+        })
     }
     return {
         setValuesLogin,
