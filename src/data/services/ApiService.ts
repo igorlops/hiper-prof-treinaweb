@@ -8,23 +8,29 @@ export const ApiService = axios.create({
     }
 })
 
-ApiService.interceptors.response.use((response) => {
-    return response;
-}, async (error: AxiosError) => {
-    if(error.request.status === 401) {
-        return await handleTokenRefresh(error)
+ApiService.interceptors.response.use(
+    (response) => {
+        return response;
+    }, 
+    async (error: AxiosError) => {
+        if (error.response?.status === 401) {
+            return await handleTokenRefresh(error);
+        }
+
+        return Promise.reject(error);
     }
-    return error;
-})
+);
 
 async function handleTokenRefresh(error: AxiosError) {
     try {
         const refreshToken = localStorage.getItem('refresh_token_hiperprof');
-        await ApiService.post<{token: string, refresh_token: string}>
-            ('/api/auth/refesh', { 
+        if(refreshToken) {
+            await ApiService.post<{token: string, refresh_token: string}>
+            ('/api/auth/refresh', { 
                 refresh_token: refreshToken
             })
             .then(({data}) => {
+                console.log(data)
                 localStorage.setItem('token_hiperprof',data.token);
                 localStorage.setItem('refresh_token_hiperprof',data.refresh_token);
             });
@@ -36,6 +42,7 @@ async function handleTokenRefresh(error: AxiosError) {
                     Authorization: `Bearer ${localStorage.getItem('token_hiperprof')}`,
                 }
             })
+        }
     } catch(error) {
         return Promise.reject(error)
     }

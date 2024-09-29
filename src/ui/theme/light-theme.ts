@@ -81,6 +81,15 @@ const theme = createTheme({
                             backgroundColor: "#9661ff"
                         }
                     }
+                },
+                {
+                    props: {
+                        variant:"outlined",
+                        color:"error"
+                    },
+                    style: {
+                        padding: "16px 40px"
+                    }
                 }
             ]
         },

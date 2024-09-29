@@ -2,7 +2,7 @@ import { PropsWithChildren } from "react";
 import { BoxStyled } from "./styles";
 
 interface ButtonFileProps {
-    onChange: (files:FileList) => void;
+    onChange?: (files:FileList) => void;
 }
 
 export default function ButtonFile({
@@ -18,7 +18,7 @@ export default function ButtonFile({
                     }}
                     onChange={(({target: {files}}) => {
                         if(files !== null && files.length) {
-                            onChange(files)
+                            onChange?.(files)
                         }
                     })}
                 />

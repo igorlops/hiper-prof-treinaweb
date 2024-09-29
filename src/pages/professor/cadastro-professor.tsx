@@ -1,8 +1,12 @@
 import PageTitle from "@components/data-display/PageTitle";
+import Dialog from "@components/feedback/Dialog";
+import ButtonFile from "@components/inputs/ButtonFile";
 import CurrencyInputMask from "@components/inputs/CurrencyInputMask";
+import { ProfessorInterface } from "@data/@types/professor";
 import useCadastroProfessor from "@data/hooks/pages/professor/useCadastroProfessor";
-import { Box, Button, Card, CircularProgress, Snackbar, TextField } from "@mui/material";
-import { BoxButtons } from "@styles/pages/professor/cadastro-professor.styles";
+import { Avatar, Box, Button, Card, CircularProgress, Icon, Snackbar, TextField, Typography } from "@mui/material";
+import { BoxAvatar, BoxButtons } from "@styles/pages/professor/cadastro-professor.styles";
+import { FormEvent } from "react";
 
 export default function CadastroProfessorPage() {
     const { 
@@ -12,12 +16,31 @@ export default function CadastroProfessorPage() {
             setSnackMessage,
             setValuesCadastro,
             handleSubmit,
-            loading
+            loading,
+            professor,
+            saveFoto,
+            openDialog,
+            setOpenDialog,
+            deleteAccount
     } = useCadastroProfessor();
     return (
         <>    
+            { professor?.id && (
+                <>
+                    <BoxAvatar>
+                        <ButtonFile onChange={saveFoto}>
+                            <Avatar src={professor.foto_perfil}>
+                                {Object.hasOwn(professor, "nome") && professor.nome[0]}
+                            </Avatar>
+                            <div className="boxIcon">
+                                <Icon>add_a_photo</Icon>
+                            </div>
+                        </ButtonFile>
+                    </BoxAvatar>
+                </>
+            )}
             <PageTitle
-                title="Cadastrar dados"
+                title={professor?.id ? "Editar professor" : "Cadastrar dados"}
                 />
             <Box sx={{maxWidth:"md", mx: "auto", my: 3}} component={'form'} onSubmit={handleSubmit}>
                 <Card sx={{ p: 3 }}>
@@ -30,6 +53,7 @@ export default function CadastroProfessorPage() {
                         }}
                         sx={{my:2}} 
                         fullWidth
+                        value={valuesCadastro?.nome ?? ''}
                     />
                     <TextField 
                         label={"Idade"} 
@@ -40,6 +64,7 @@ export default function CadastroProfessorPage() {
                         }}
                         sx={{my:2}} 
                         fullWidth
+                        value={valuesCadastro?.idade ?? ''}
                     />
                     <CurrencyInputMask 
                         label={"Valor por aula"} 
@@ -50,6 +75,8 @@ export default function CadastroProfessorPage() {
                         }}
                         sx={{my:2}} 
                         fullWidth
+                        value={valuesCadastro?.valor_hora ?? ''}
+
                     />
                     <TextField 
                         label={"Descrição"} rows={4} 
@@ -60,6 +87,7 @@ export default function CadastroProfessorPage() {
                             setValuesCadastro((prevState) => ({...prevState, descricao:value}));
                         }}
                         fullWidth
+                    value={valuesCadastro?.descricao ?? ''}
                     />
                 </Card>
                 <Card sx={{ p: 3, my: 5}}>
@@ -72,6 +100,7 @@ export default function CadastroProfessorPage() {
                             setValuesCadastro((prevState) => ({...prevState, email:value}));
                         }}
                         fullWidth
+                        value={valuesCadastro?.email ?? ''}
                     />
                     <TextField 
                         label={"Senha"} type="password" 
@@ -95,12 +124,37 @@ export default function CadastroProfessorPage() {
                     />
                 </Card>
                 <BoxButtons>
-                    <Button type="submit" variant="contained">
-                        {loading ? 
-                        
-                        <CircularProgress color="inherit"/> : 'Cadastrar'}
-                    </Button>
+                    <ButtonSubmit
+                        handleSubmit={handleSubmit}
+                        loading={loading}
+                        professor={professor}
+                    />
                 </BoxButtons>
+                {professor?.id && (
+                    <>
+                        <Typography variant="body2"
+                            color={"grey"}    
+                            textAlign={"center"}
+                            sx={{my:4}}
+                        >
+                            Você pode apagar a sua conta, desse modo não será
+                            mais exibido na plataforma.
+                        </Typography>
+                        <BoxButtons>
+                            <Button 
+                                onClick={() => setOpenDialog(true)} 
+                                fullWidth 
+                                variant="outlined" 
+                                color="error">
+                                {loading ? 
+                                    <CircularProgress color="inherit"/> 
+                                    : 
+                                    "Apagar minha conta"
+                                }
+                            </Button>
+                        </BoxButtons>
+                    </>
+                )}
             </Box>
             <Snackbar
                 open = {snackMessage.length > 0}
@@ -108,6 +162,33 @@ export default function CadastroProfessorPage() {
                 autoHideDuration={4000}
                 onClose={() => setSnackMessage("")}
             />
+            <Dialog
+                isOpen={openDialog}
+                title="Tem certeza que deseja excluir?"
+                onConfirm={ deleteAccount }
+                onCancel={() => setOpenDialog(false)}
+                onClose={() => setOpenDialog(false)}
+            />
         </>
+    )
+}
+
+interface ButtonSubmitProps {
+    professor: ProfessorInterface | undefined;
+    handleSubmit: () => void
+    loading: boolean
+}
+function ButtonSubmit({handleSubmit,professor,loading}:ButtonSubmitProps) {
+    if(loading) {
+        return (
+            <Button onClick={handleSubmit} fullWidth variant="contained">
+                <CircularProgress color="inherit"/>
+            </Button>
+        )
+    } 
+    return (
+        <Button onClick={handleSubmit} fullWidth variant="contained">
+            {professor?.id ? "Editar" : "Cadastrar"}
+        </Button>
     )
 }

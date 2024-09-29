@@ -14,12 +14,7 @@ export default function useDetalheProfessor() {
     [professor, setProfessor] = useState<ProfessorInterface>(),
     [professores, setProfessores] = useState<ProfessorInterface[]>([]),
     [openDialog, setOpenDialog] = useState<boolean>(false),
-    [aluno, setAluno] = useState<AlunoInterface>({
-        nome: "",
-        data_aula:"",
-        email:"",
-        id:1
-    }),
+    [aluno, setAluno] = useState({} as AlunoInterface),
     [snackMessage, setSnackMessage] = useState(''),
     [alunoErro, setAlunoErro] = useState<AlunoErrorResponseInterface>()
 
@@ -76,12 +71,7 @@ export default function useDetalheProfessor() {
             .then(
                 () => {
                     setOpenDialog(false),
-                    setAluno({ 
-                        data_aula: "", 
-                        nome: "", 
-                        email:"", 
-                        id:1
-                    }),
+                    setAluno({} as AlunoInterface),
                     setSnackMessage("Agendado com sucesso")
                 }
             )

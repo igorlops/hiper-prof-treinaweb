@@ -5,10 +5,11 @@ import { ProfessorContext } from "@data/contexts/ProfessorContext";
 import { ApiService } from "@data/services/ApiService";
 import { FormSchemaService } from "@data/services/FormSchemaService";
 import { getUser } from "@data/services/MeService";
+import { TextFormatService } from "@data/services/TextFormatService";
 import { Router } from "@routes/routes";
 import { AxiosError, AxiosResponse } from "axios";
 import { useRouter } from "next/router";
-import { FormEvent, useContext, useState } from "react";
+import { FormEvent, useContext, useEffect, useState } from "react";
 
 export default function useCadastroProfessor() {
     const [valuesCadastro, setValuesCadastro] = useState(
@@ -18,10 +19,37 @@ export default function useCadastroProfessor() {
     [loading, setLoading] = useState(false),
     [snackMessage, setSnackMessage] = useState(""),
     router = useRouter(),
-    {ProfessorDispatch} = useContext(ProfessorContext)
+    {ProfessorDispatch, ProfessorState: professor} = useContext(ProfessorContext),
+    [openDialog, setOpenDialog] = useState(false)
 
-    async function handleSubmit(event:FormEvent) {
-        event.preventDefault();
+    useEffect(() => {
+        setValuesCadastro({
+            ...professor, 
+            valor_hora: TextFormatService.currency(professor?.valor_hora),
+        } as ProfessorCadastroInterface)
+    }, [professor])
+
+    async function saveFoto(files:FileList) {
+        const foto = { foto: files[0] }
+        console.log(foto)
+
+        await ApiService.post('/api/professores/foto', foto, {
+            headers: {
+                "Content-Type":"multipart/form-data",
+                Authorization: `Bearer ${localStorage.getItem('token_hiperprof')}`
+            },
+        }).then(({ data}: AxiosResponse<{message: string}>) => {
+            setSnackMessage(data.message)
+            handleGetUser();
+        })
+        .catch(({ response }: AxiosError<{message:string}> ) => {
+            if(response) {
+                setSnackMessage(response!.data.message)
+            }
+        })
+    }
+
+    async function handleSubmit() {
         const formValidate = FormSchemaService.cadastroProfessor(valuesCadastro);
         setValuesErrorCadastro(formValidate)
         const isValid = Object.keys(formValidate).length === 0;
@@ -37,29 +65,50 @@ export default function useCadastroProfessor() {
                 ...valuesCadastro,
                 valor_hora: valorFormatado
             } as ProfessorCadastroInterface;
+            delete data.foto_perfil;
 
-            await ApiService.post('/api/professores', data)
-                .then( async() => {
+            const token = localStorage.getItem('token_hiperprof')
+
+            console.log(token)
+            const typeHttp = token ? ApiService.put : ApiService.post;
+
+
+            await typeHttp('/api/professores', data, {
+                headers: token ?
+                    { Authorization: `Bearer ${token}` }
+                    : 
+                    {}
+            })
+            .then( async() => {
+                await handleLogin()
+                
+                if(!token) {
                     setSnackMessage("Professor cadastrado com sucesso")
-                    await handleLogin()
                     Router.listaDeAlunos.push(router)
-                }).catch(({response} : AxiosError<ResponseErrorInterface<ProfessorErrorInterface>>) => {
-                    if(response) {
-                        const { message, errors } = response.data;
-                        setValuesErrorCadastro(errors);
-                        setSnackMessage(message)
-                    }
-                })
-                .finally(() => setLoading(false))
+                } 
+                token && setSnackMessage("Professor atualizado com sucesso")
+            })
+            .catch((
+                {response} : AxiosError<ResponseErrorInterface<ProfessorErrorInterface>>) => {
+                if(response) {
+                    const { message, errors } = response.data;
+                    setValuesErrorCadastro(errors);
+                    setSnackMessage(message)
+                }
+            })
+            .finally(() => setLoading(false))
         }
     }
 
     async function handleLogin() {
         setLoading(true)
         ApiService.post('/api/auth/login', {
-            email:valuesCadastro.email, password: valuesCadastro.password
+            email:valuesCadastro.email, 
+            password: valuesCadastro.password
         } as LoginInterface) 
-        .then( async ({data}:AxiosResponse<ResponseLoginInterface>) => {
+        .then( async (
+                {data}:AxiosResponse<ResponseLoginInterface>
+            ) => {
             localStorage.setItem('token_hiperprof', data.token)
             localStorage.setItem('refresh_token_hiperprof', data.refresh_token)
             await handleGetUser();
@@ -78,6 +127,31 @@ export default function useCadastroProfessor() {
             );
         });
     }
+
+    async function deleteAccount() {
+        if(!loading) {
+            setLoading(true)
+            ApiService.delete("/api/professores", {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token_hiperprof')}`,
+                }
+            })
+            .then(() => {
+                ProfessorDispatch(undefined)
+                localStorage.removeItem("token_hiperprof")
+                localStorage.removeItem("refresh_token_hiperprof")
+                Router.home.push(router)
+            })
+            .catch(({response}:AxiosError<{message: string}>) => {
+                if(response) {
+                    setSnackMessage(response.data.message)
+                }
+            })
+            .finally(() => {
+                setLoading(false)
+            })
+        }
+    }
     return {
         valuesCadastro,
         valuesErrorCadastro,
@@ -85,6 +159,11 @@ export default function useCadastroProfessor() {
         setSnackMessage,
         setValuesCadastro,
         handleSubmit, 
-        loading
+        loading,
+        professor,
+        saveFoto,
+        openDialog,
+        setOpenDialog,
+        deleteAccount
     }
 }

@@ -20,7 +20,7 @@ export default function DetalheProfessor() {
         snackMessage,
         setSnackMessage,
         alunoErro,
-        setAlunoErro
+        setAlunoErro,
     } = useDetalheProfessor();
 
     console.log(professor)
