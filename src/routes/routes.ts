@@ -6,18 +6,18 @@ export const Router = {
         push: function(router: NextRouter){
             router.push({pathname: this.name});
         },
-        icon:"",
+        icon:"home",
     },
     pesquisaProfessor: {
         name: "/pesquisa-professor",
-        push: function(router: NextRouter,search:string) {
+        push: function(router: NextRouter,search?: string) {
             router.push( {pathname: this.name, query:{ search }})
         },
         icon: ""
     },
     detalheProfessor: {
         name: "/professor/detalhe-professor",
-        push: function(router: NextRouter, search: string) {
+        push: function(router: NextRouter, search?: string) {
             router.push( {pathname: this.name, query: { search }})
         },
         icon: ""
@@ -27,14 +27,14 @@ export const Router = {
         push: function(router: NextRouter) {
             router.push( {pathname: this.name})
         },
-        icon: ""
+        icon: "app_registration"
     },
     listaDeAlunos: {
         name: "/professor/",
         push: function(router: NextRouter) {
             router.push( {pathname: this.name})
         },
-        icon: ""
+        icon: "lista"
     },
     login: {
         name: "/login",
