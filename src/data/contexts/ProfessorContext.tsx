@@ -1,5 +1,6 @@
-import { createContext, Dispatch, PropsWithChildren, SetStateAction, useState } from "react";
+import { createContext, Dispatch, PropsWithChildren, SetStateAction, useEffect, useState } from "react";
 import { ProfessorInterface } from "@data/@types/professor";
+import { getUser } from "@data/services/MeService";
 
 // Interface que define o estado e o dispatch
 interface ProfessorReducerInterface {
@@ -20,6 +21,11 @@ export const ProfessorContext = createContext(initialValue);
 export const ProfessorProvider: React.FC<PropsWithChildren> = ({ children }) => {
     const [professor, setProfessor] = useState<ProfessorInterface>();
 
+    useEffect(() => {
+        getUser().then(({ data }) => {
+            setProfessor(data)
+        })
+    }, [])
     return (
         // Passando o valor correto para o Provider
         <ProfessorContext.Provider value={{ ProfessorState: professor, ProfessorDispatch: setProfessor }}>
