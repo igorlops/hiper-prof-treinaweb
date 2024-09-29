@@ -1,6 +1,7 @@
 import { createContext, Dispatch, PropsWithChildren, SetStateAction, useEffect, useState } from "react";
 import { ProfessorInterface } from "@data/@types/professor";
 import { getUser } from "@data/services/MeService";
+import { AxiosError } from "axios";
 
 // Interface que define o estado e o dispatch
 interface ProfessorReducerInterface {
@@ -22,8 +23,10 @@ export const ProfessorProvider: React.FC<PropsWithChildren> = ({ children }) => 
     const [professor, setProfessor] = useState<ProfessorInterface>();
 
     useEffect(() => {
-        getUser().then(({ data }) => {
-            setProfessor(data)
+        getUser().then((data) => {
+            setProfessor(data.data)
+        }).catch((error: AxiosError<{message: string}>) => {
+            return "Não há cadastro. Erro:"+error;
         })
     }, [])
     return (
