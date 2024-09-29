@@ -19,7 +19,8 @@ export default function useIndex(){
 
 
     useEffect(() => {
-        getUser()
+        const token = localStorage.getItem('token_hiperprof');
+        token && getUser()
             .then(() => Router.listaDeAlunos.push(router))
         // eslint-disable-next-line react-hooks/exaustive-deps
     }, []);
