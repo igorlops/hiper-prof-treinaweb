@@ -1,6 +1,7 @@
+import { getUser } from "@data/services/MeService";
 import { Router } from "@routes/routes";
 import { useRouter } from "next/router";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 
 export default function useIndex(){
     const router = useRouter(),
@@ -15,6 +16,13 @@ export default function useIndex(){
             SetMessageError("Mínimo de 3 caracteres")
         }
     }
+
+
+    useEffect(() => {
+        getUser()
+            .then(() => Router.listaDeAlunos.push(router))
+        // eslint-disable-next-line react-hooks/exaustive-deps
+    }, []);
 
     return {
         SetSearch,
